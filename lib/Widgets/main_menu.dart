@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_notes/Database/Database_helper.dart';
+import 'package:flutter_notes/Widgets/edit_note.dart';
 
 class main_menu extends StatefulWidget {
   const main_menu({Key? key}) : super(key: key);
@@ -37,18 +38,14 @@ class _MainMenuState extends State<main_menu> {
     _refreshData();
   }
 
-  // Update an existing data
-  Future<void> updateItem(int id) async {
-    await DatabaseHelper.updateNote(
-        id, _titleController.text, _descriptionController.text);
-    _refreshData();
-  }
-
-  // Delete an item
   void deleteItem(int id) async {
     await DatabaseHelper.deleteNote(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Successfully deleted!', style: TextStyle(color: Colors.white),), backgroundColor: Colors.black54));
+        content: Text(
+          'Successfully deleted!',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black54));
     _refreshData();
   }
 
@@ -57,6 +54,7 @@ class _MainMenuState extends State<main_menu> {
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          var _a = myData.isEmpty ? "none" : myData.length;
           // These are the slivers that show up in the "outer" scroll view.
           return <Widget>[
             SliverOverlapAbsorber(
@@ -69,7 +67,24 @@ class _MainMenuState extends State<main_menu> {
                 flexibleSpace: FlexibleSpaceBar(
                   expandedTitleScale: 1,
                   title: _safeAreaBarButtons(),
-                  background: _safeAreaTitle(),
+                  background: SafeArea(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "All Notes",
+                          style: TextStyle(fontSize: 36),
+                        ),
+                        Text(
+                          '$_a notes',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -81,13 +96,15 @@ class _MainMenuState extends State<main_menu> {
               )
             : myData.isEmpty
                 ? const Center(child: Text("No Data Available"))
-                : Container( padding: const EdgeInsets.all(8.0),
-                  margin: EdgeInsets.only(top: 50),
-                  child: Container(
-                    child: ListView.builder(
+                : Container(
+                    padding: const EdgeInsets.all(8.0),
+                    margin: EdgeInsets.only(top: 50),
+                    child: Container(
+                      child: ListView.builder(
                         itemCount: myData.length,
                         itemBuilder: (context, index) => Card(
-                          color: index % 2 == 0 ? Colors.black54: Colors.black87,
+                          color:
+                              index % 2 == 0 ? Colors.black54 : Colors.black87,
                           child: Dismissible(
                             key: UniqueKey(),
                             background: Container(color: Colors.redAccent),
@@ -99,89 +116,40 @@ class _MainMenuState extends State<main_menu> {
                               title: Text(myData[index]['title']),
                               subtitle: Text(myData[index]['createdAt']),
                               onTap: () {
-                                // Navigator.push(context,
-                                //     MaterialPageRoute<Widget>(builder: (BuildContext context) {
-                                //
-                                //       return edit_note();
-                                //     }
-                                //     )
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => edit_note(
+                                      index: index,
+                                      title: myData[index]['title'],
+                                      text: myData[index]['description'],
+                                    ),
+                                  ),
+                                ).then((value) => _refreshData());
                               },
                             ),
                           ),
                         ),
                       ),
+                    ),
                   ),
-                ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigator.push(context,
-          //     MaterialPageRoute<Widget>(builder: (BuildContext context) {
-          //       return edit_note();
-          //       }));
-          print("КНОПКА НАЖАЛА");
-          addNote();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => edit_note(
+                index: null,
+              ),
+            ),
+          ).then((value) => _refreshData());
         },
         backgroundColor: Colors.redAccent,
         child: const Icon(
           Icons.note_add_outlined,
           size: 28,
         ),
-      ),
-    );
-  }
-}
-
-// Card view
-class _noteCard extends StatelessWidget {
-  const _noteCard({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: FlutterLogo(size: 56.0),
-        title: Text('Title'),
-        subtitle: Text('Date create'),
-        onTap: () {
-          // Navigator.push(context,
-          //     MaterialPageRoute<Widget>(builder: (BuildContext context) {
-          //
-          //       return edit_note();
-          //     }));
-        },
-      ),
-    );
-  }
-}
-
-// Area title SliverAppBar
-class _safeAreaTitle extends StatelessWidget {
-  const _safeAreaTitle({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "All Notes",
-            style: TextStyle(fontSize: 36),
-          ),
-          Text(
-            "29 Notes",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
-          ),
-        ],
       ),
     );
   }

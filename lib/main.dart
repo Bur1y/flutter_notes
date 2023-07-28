@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Notes',
+        title: 'Flutter Notes',
         theme: ThemeData(
           colorScheme: ColorScheme.dark(),
           useMaterial3: true,
@@ -20,4 +20,3 @@ class MyApp extends StatelessWidget {
         home: main_menu());
   }
 }
-

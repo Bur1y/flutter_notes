@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class DatabaseHelper {
-
-
   static Future<sql.Database> db() async {
     return sql.openDatabase(
       'Notes.db',
@@ -44,7 +42,6 @@ class DatabaseHelper {
     return db.query('notes', where: "id = ?", whereArgs: [id], limit: 1);
   }
 
-  // Update an item by id
   static Future<int> updateNote(
       int id, String title, String? descrption) async {
     final db = await DatabaseHelper.db();
@@ -56,7 +53,7 @@ class DatabaseHelper {
     };
 
     final result =
-    await db.update('notes', data, where: "id = ?", whereArgs: [id]);
+        await db.update('notes', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
 
@@ -66,7 +63,8 @@ class DatabaseHelper {
     try {
       await db.delete("notes", where: "id = ?", whereArgs: [id]);
     } catch (err) {
-      debugPrint("Всё пиздец - удаление отъебнуло, пиздуй смотреть трассировку: $err");
+      debugPrint(
+          "Всё пиздец - удаление отъебнуло, пиздуй смотреть трассировку: $err");
     }
   }
 }
